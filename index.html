@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Me-API Playground - Fixed Version</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Debug Panel -->
+        <div class="debug-panel" id="debug-panel">
+            <div class="debug-header">
+                <h4>Debug Console</h4>
+                <button class="btn btn--sm" onclick="clearDebugLog()">Clear</button>
+                <button class="btn btn--sm" onclick="toggleDebugPanel()">Hide</button>
+            </div>
+            <div class="debug-log" id="debug-log"></div>
+        </div>
+
+        <!-- Header with Navigation -->
+        <header class="app-header">
+            <div class="container">
+                <div class="header-content">
+                    <h1 class="app-title">Me-API Playground</h1>
+                    <div class="header-controls">
+                        <button class="btn btn--sm btn--secondary" onclick="toggleDebugPanel()">Debug</button>
+                        <nav class="nav-tabs">
+                            <button class="nav-tab nav-tab--active" data-view="profile" onclick="switchView('profile')">Profile</button>
+                            <button class="nav-tab" data-view="projects" onclick="switchView('projects')">Projects</button>
+                            <button class="nav-tab" data-view="skills" onclick="switchView('skills')">Skills</button>
+                            <button class="nav-tab" data-view="search" onclick="switchView('search')">Search</button>
+                            <button class="nav-tab" data-view="health" onclick="switchView('health')">Health</button>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="app-main">
+            <div class="container">
+                <!-- Error Message Display -->
+                <div class="error-banner hidden" id="error-banner">
+                    <div class="error-content">
+                        <strong>Error:</strong> <span id="error-message-text"></span>
+                        <button class="btn btn--sm btn--outline" onclick="hideErrorBanner()">Dismiss</button>
+                    </div>
+                </div>
+
+                <!-- Success Message Display -->
+                <div class="success-banner hidden" id="success-banner">
+                    <div class="success-content">
+                        <strong>Success:</strong> <span id="success-message-text"></span>
+                        <button class="btn btn--sm btn--outline" onclick="hideSuccessBanner()">Dismiss</button>
+                    </div>
+                </div>
+
+                <!-- Profile View -->
+                <div class="view view--active" id="profile-view">
+                    <div class="view-header">
+                        <h2>Profile</h2>
+                        <button class="btn btn--primary" onclick="openEditModal()">Edit Profile</button>
+                    </div>
+                    
+                    <div class="profile-content">
+                        <div class="profile-basic-info card">
+                            <div class="card__body">
+                                <h3>Basic Information</h3>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <label>Name:</label>
+                                        <span id="profile-name">Loading...</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Email:</label>
+                                        <span id="profile-email">Loading...</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Location:</label>
+                                        <span id="profile-location">Loading...</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Title:</label>
+                                        <span id="profile-title">Loading...</span>
+                                    </div>
+                                </div>
+                                <div class="bio-section">
+                                    <label>Bio:</label>
+                                    <p id="profile-bio">Loading...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-sections">
+                            <div class="profile-education card">
+                                <div class="card__body">
+                                    <h3>Education</h3>
+                                    <div id="education-list">Loading...</div>
+                                </div>
+                            </div>
+
+                            <div class="profile-work card">
+                                <div class="card__body">
+                                    <h3>Work Experience</h3>
+                                    <div id="work-list">Loading...</div>
+                                </div>
+                            </div>
+
+                            <div class="profile-links card">
+                                <div class="card__body">
+                                    <h3>Professional Links</h3>
+                                    <div id="links-list" class="links-grid">Loading...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projects View -->
+                <div class="view" id="projects-view">
+                    <div class="view-header">
+                        <h2>Projects</h2>
+                        <div class="search-controls">
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="project-skill-filter" 
+                                placeholder="Filter by skill (e.g., React, Python)"
+                            >
+                            <button class="btn btn--primary" onclick="filterProjects()">Filter</button>
+                            <button class="btn btn--secondary" onclick="clearProjectFilter()">Clear</button>
+                        </div>
+                    </div>
+                    <div id="projects-list" class="projects-grid">Loading projects...</div>
+                </div>
+
+                <!-- Skills View -->
+                <div class="view" id="skills-view">
+                    <div class="view-header">
+                        <h2>Skills Overview</h2>
+                        <p class="view-subtitle">Skills with project counts and experience levels</p>
+                    </div>
+                    <div id="skills-list" class="skills-grid">Loading skills...</div>
+                </div>
+
+                <!-- Search View -->
+                <div class="view" id="search-view">
+                    <div class="view-header">
+                        <h2>Search</h2>
+                        <div class="search-controls">
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="global-search" 
+                                placeholder="Search across all profile data..."
+                                onkeypress="handleSearchKeypress(event)"
+                            >
+                            <button class="btn btn--primary" onclick="performGlobalSearch()">Search</button>
+                        </div>
+                    </div>
+                    <div id="search-results">
+                        <div class="no-results">Enter a search term to get started</div>
+                    </div>
+                </div>
+
+                <!-- Health View -->
+                <div class="view" id="health-view">
+                    <div class="view-header">
+                        <h2>System Health Status</h2>
+                        <button class="btn btn--secondary" onclick="refreshHealthStatus()">Refresh</button>
+                    </div>
+                    <div id="health-status" class="health-grid">Loading health status...</div>
+                </div>
+
+                <!-- Profile Edit Modal -->
+                <div class="modal hidden" id="edit-modal">
+                    <div class="modal-overlay" onclick="closeEditModal()"></div>
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Edit Profile</h3>
+                            <button class="modal-close" onclick="closeEditModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="profile-edit-form" onsubmit="handleProfileSave(event)">
+                                <div class="form-group">
+                                    <label class="form-label" for="edit-name">Name*</label>
+                                    <input type="text" class="form-control" id="edit-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="edit-email">Email*</label>
+                                    <input type="email" class="form-control" id="edit-email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="edit-location">Location*</label>
+                                    <input type="text" class="form-control" id="edit-location" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="edit-title">Title*</label>
+                                    <input type="text" class="form-control" id="edit-title" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="edit-bio">Bio*</label>
+                                    <textarea class="form-control" id="edit-bio" rows="4" required></textarea>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn--secondary" onclick="closeEditModal()">Cancel</button>
+                                    <button type="submit" class="btn btn--primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
